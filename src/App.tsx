@@ -35,21 +35,28 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
     const attemptPlay = async () => {
       if (!videoRef.current) return;
       
-      // Force volume to 0.5 and ensure it's not muted
-      videoRef.current.volume = 0.5;
-      videoRef.current.muted = false;
-      setVolume(0.5);
-      setIsMuted(false);
-      
       try {
+        // Try unmuted first with 50% volume
+        videoRef.current.muted = false;
+        videoRef.current.volume = 0.5;
         await videoRef.current.play();
         setIsPlaying(true);
+        setIsMuted(false);
         setShowPauseMessage(false);
       } catch (error) {
-        console.log("Unmuted autoplay blocked by browser policy:", error);
-        // If blocked, we stay paused so the user can click the big play button
-        // This respects the "no en mute" requirement
-        setIsPlaying(false);
+        console.log("Unmuted autoplay blocked, trying muted...");
+        try {
+          // Try muted if unmuted fails (standard browser behavior)
+          if (!videoRef.current) return;
+          videoRef.current.muted = true;
+          await videoRef.current.play();
+          setIsPlaying(true);
+          setIsMuted(true);
+          setShowPauseMessage(false);
+        } catch (mutedError) {
+          console.error("Muted autoplay also blocked:", mutedError);
+          setIsPlaying(false);
+        }
       }
     };
 
