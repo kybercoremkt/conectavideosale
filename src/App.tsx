@@ -32,19 +32,28 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
   const [showPauseMessage, setShowPauseMessage] = useState(false);
 
   useEffect(() => {
-    // Attempt to autoplay on mount
-    if (videoRef.current) {
+    const attemptPlay = async () => {
+      if (!videoRef.current) return;
+      
+      // Force volume to 0.5 and ensure it's not muted
       videoRef.current.volume = 0.5;
       videoRef.current.muted = false;
-      videoRef.current.play().then(() => {
+      setVolume(0.5);
+      setIsMuted(false);
+      
+      try {
+        await videoRef.current.play();
         setIsPlaying(true);
         setShowPauseMessage(false);
-      }).catch(error => {
-        console.log("Autoplay blocked:", error);
-        // If blocked, we stay paused and show the big play button
+      } catch (error) {
+        console.log("Unmuted autoplay blocked by browser policy:", error);
+        // If blocked, we stay paused so the user can click the big play button
+        // This respects the "no en mute" requirement
         setIsPlaying(false);
-      });
-    }
+      }
+    };
+
+    attemptPlay();
   }, []);
 
   const togglePlay = () => {
