@@ -30,6 +30,7 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
   const [isMuted, setIsMuted] = useState(false); // Start unmuted as requested
   const [showControls, setShowControls] = useState(true);
   const [showPauseMessage, setShowPauseMessage] = useState(false);
+  const [showMuteMessage, setShowMuteMessage] = useState(false);
 
   useEffect(() => {
     const attemptPlay = async () => {
@@ -43,6 +44,7 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
         setIsPlaying(true);
         setIsMuted(false);
         setShowPauseMessage(false);
+        setShowMuteMessage(false);
       } catch (error) {
         console.log("Unmuted autoplay blocked, trying muted...");
         try {
@@ -53,6 +55,7 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
           setIsPlaying(true);
           setIsMuted(true);
           setShowPauseMessage(false);
+          setShowMuteMessage(true);
         } catch (mutedError) {
           console.error("Muted autoplay also blocked:", mutedError);
           setIsPlaying(false);
@@ -89,7 +92,9 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
     setVolume(newVolume);
     if (videoRef.current) {
       videoRef.current.volume = newVolume;
-      setIsMuted(newVolume === 0);
+      const muted = newVolume === 0;
+      setIsMuted(muted);
+      if (!muted) setShowMuteMessage(false);
     }
   };
 
@@ -98,6 +103,7 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
       const newMuted = !isMuted;
       setIsMuted(newMuted);
       videoRef.current.muted = newMuted;
+      if (!newMuted) setShowMuteMessage(false);
     }
   };
 
@@ -120,6 +126,24 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
         muted={isMuted}
       />
       
+      <AnimatePresence>
+        {isPlaying && isMuted && showMuteMessage && (
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="absolute top-6 right-6 z-50"
+          >
+            <button 
+              onClick={toggleMute}
+              className="bg-brand text-slate-900 px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-xl animate-bounce"
+            >
+              <VolumeX size={16} /> Activa el audio
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {showControls && (
           <motion.div 
