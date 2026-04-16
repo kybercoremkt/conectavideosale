@@ -22,6 +22,29 @@ import {
   Volume1
 } from 'lucide-react';
 
+const Header = ({ isVideoFinished }: { isVideoFinished: boolean }) => (
+  <header className="absolute top-0 left-0 right-0 z-[60] p-6">
+    <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <div className="bg-white p-2 rounded-xl shadow-lg">
+        <img 
+          src="https://360conecta.com/img/Logogrande.png" 
+          alt="Conecta 360 Logo" 
+          className="h-10 md:h-14 w-auto object-contain"
+          referrerPolicy="no-referrer"
+        />
+      </div>
+      <div className="bg-white p-2 rounded-xl shadow-lg">
+        <img 
+          src="https://www.metlife.com.mx/content/dam/metlifecom/global/icons-header/metlife_logo.png" 
+          alt="MetLife Logo" 
+          className="h-8 md:h-12 w-auto object-contain"
+          referrerPolicy="no-referrer"
+        />
+      </div>
+    </div>
+  </header>
+);
+
 const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -228,6 +251,7 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
 
 const Hero = ({ onVideoFinished, isVideoFinished }: { onVideoFinished: () => void, isVideoFinished: boolean }) => (
   <section className={`relative min-h-screen md:h-screen flex flex-col items-center justify-center text-center px-4 py-8 overflow-hidden transition-colors duration-700 ${isVideoFinished ? 'bg-slate-50' : 'bg-slate-900'}`}>
+    <Header isVideoFinished={isVideoFinished} />
     <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,179,2,0.1),transparent_50%)]" />
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -235,16 +259,9 @@ const Hero = ({ onVideoFinished, isVideoFinished }: { onVideoFinished: () => voi
       transition={{ duration: 0.6 }}
       className="max-w-4xl w-full relative z-50 flex flex-col items-center"
     >
-      <span className="inline-block px-3 py-1 mb-2 text-[10px] md:text-xs font-bold tracking-wider text-brand uppercase bg-brand/10 rounded-full">
-        Oportunidad Exclusiva
-      </span>
       <h1 className={`font-display text-3xl md:text-5xl lg:text-6xl font-extrabold mb-3 leading-tight transition-colors duration-700 ${isVideoFinished ? 'text-slate-900' : 'text-white'}`}>
         Esta carrera <span className="text-brand">no es para todos…</span>
       </h1>
-      <p className={`text-base md:text-lg lg:text-xl mb-4 max-w-2xl mx-auto leading-relaxed transition-colors duration-700 ${isVideoFinished ? 'text-slate-600' : 'text-slate-300'}`}>
-        Conviértete en Consultor de Seguros y crea una nueva línea de ingresos. 
-        <span className={`block font-semibold mt-1 transition-colors duration-700 ${isVideoFinished ? 'text-slate-900' : 'text-white'}`}>Sin inversión. Con formación. Respaldado por MetLife.</span>
-      </p>
       
       <div className="w-full max-w-3xl">
         <VideoPlayer onFinished={onVideoFinished} />
@@ -315,9 +332,9 @@ const WhatIsIt = () => (
         </div>
         <div className="relative">
           <img 
-            src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800" 
-            alt="Consultores trabajando" 
-            className="rounded-3xl shadow-2xl"
+            src="https://360conecta.com/img/grupo1.jpeg" 
+            alt="Consultores Conecta 360" 
+            className="rounded-3xl shadow-2xl w-full object-cover aspect-[4/3]"
             referrerPolicy="no-referrer"
           />
           <div className="absolute -bottom-6 -left-6 bg-brand text-slate-900 p-6 rounded-2xl shadow-xl hidden md:block">
@@ -341,21 +358,33 @@ const WhatYouWillDo = () => {
 
   return (
     <section className="section-padding bg-slate-50">
-      <div className="max-w-4xl mx-auto">
-        <SectionHeading title="¿Qué implica esta carrera?" />
-        <div className="grid gap-4">
-          {steps.map((step, i) => (
-            <motion.div 
-              key={i}
-              whileHover={{ x: 10 }}
-              className="flex items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100"
-            >
-              <div className="w-8 h-8 bg-brand text-slate-900 rounded-full flex items-center justify-center font-bold shrink-0">
-                {i + 1}
-              </div>
-              <p className="text-lg font-medium text-slate-800">{step}</p>
-            </motion.div>
-          ))}
+      <div className="max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="order-2 md:order-1">
+            <img 
+              src="https://360conecta.com/img/consejo.jpeg" 
+              alt="Capacitación y Consejo" 
+              className="rounded-3xl shadow-2xl w-full object-cover aspect-[4/3]"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+          <div className="order-1 md:order-2">
+            <SectionHeading title="¿Qué implica esta carrera?" />
+            <div className="grid gap-4">
+              {steps.map((step, i) => (
+                <motion.div 
+                  key={i}
+                  whileHover={{ x: 10 }}
+                  className="flex items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100"
+                >
+                  <div className="w-8 h-8 bg-brand text-slate-900 rounded-full flex items-center justify-center font-bold shrink-0">
+                    {i + 1}
+                  </div>
+                  <p className="text-lg font-medium text-slate-800">{step}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -489,13 +518,25 @@ const WhoWeSeek = () => {
   return (
     <section className="section-padding bg-white">
       <div className="max-w-6xl mx-auto">
-        <SectionHeading title="Perfiles que mejor funcionan en esta carrera" />
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {profiles.map((profile, i) => (
-            <div key={i} className="p-6 rounded-2xl bg-slate-50 text-center font-bold text-slate-700 border border-slate-100">
-              {profile}
+        <div className="grid md:grid-cols-2 gap-12 items-center mb-12">
+          <div>
+            <SectionHeading title="Perfiles que mejor funcionan en esta carrera" />
+            <div className="grid grid-cols-2 gap-4">
+              {profiles.map((profile, i) => (
+                <div key={i} className="p-4 rounded-2xl bg-slate-50 text-center font-bold text-slate-700 border border-slate-100 text-sm md:text-base">
+                  {profile}
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+          <div>
+            <img 
+              src="https://360conecta.com/img/grupo2masgrande.jpeg" 
+              alt="Equipo Conecta 360" 
+              className="rounded-3xl shadow-2xl w-full object-cover aspect-[4/3]"
+              referrerPolicy="no-referrer"
+            />
+          </div>
         </div>
       </div>
     </section>
@@ -515,21 +556,21 @@ const Comparison = () => {
     <section className="section-padding bg-slate-50">
       <div className="max-w-4xl mx-auto">
         <SectionHeading title="Empleo vs Carrera como Consultor" />
-        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <table className="w-full text-left border-collapse min-w-[500px]">
             <thead>
               <tr className="bg-slate-900 text-white">
-                <th className="p-6 font-bold">Aspecto</th>
-                <th className="p-6 font-bold">Empleo tradicional</th>
-                <th className="p-6 font-bold text-brand">Conecta 360</th>
+                <th className="p-4 md:p-6 font-bold text-sm md:text-base">Aspecto</th>
+                <th className="p-4 md:p-6 font-bold text-sm md:text-base">Empleo tradicional</th>
+                <th className="p-4 md:p-6 font-bold text-sm md:text-base text-brand">Conecta 360</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {rows.map((row, i) => (
-                <tr key={i} className="hover:bg-slate-50 transition-colors">
-                  <td className="p-6 font-semibold text-slate-500">{row.aspect}</td>
-                  <td className="p-6 text-slate-700">{row.job}</td>
-                  <td className="p-6 font-bold text-brand-dark">{row.career}</td>
+                <tr key={i} className="hover:bg-slate-50 transition-colors text-sm md:text-base">
+                  <td className="p-4 md:p-6 font-semibold text-slate-500">{row.aspect}</td>
+                  <td className="p-4 md:p-6 text-slate-700">{row.job}</td>
+                  <td className="p-4 md:p-6 font-bold text-brand-dark">{row.career}</td>
                 </tr>
               ))}
             </tbody>
@@ -662,6 +703,29 @@ const FinalCTA = () => (
   </section>
 );
 
+const CertificationBanner = () => (
+  <section className="py-12 bg-white border-y border-slate-100">
+    <div className="max-w-4xl mx-auto px-6 flex flex-col md:flex-row items-center justify-center gap-8 text-center md:text-left">
+      <div className="bg-white p-4 rounded-2xl shadow-md border border-slate-50">
+        <img 
+          src="https://www.metlife.com.mx/content/dam/metlifecom/global/icons-header/metlife_logo.png" 
+          alt="MetLife Logo" 
+          className="h-12 w-auto object-contain"
+          referrerPolicy="no-referrer"
+        />
+      </div>
+      <div>
+        <h2 className="text-2xl md:text-3xl font-display font-bold text-slate-900">
+          Promotoría aprobada y certificada por MetLife
+        </h2>
+        <p className="text-slate-600 mt-2">
+          Garantizamos los más altos estándares de calidad y profesionalismo en el sector asegurador.
+        </p>
+      </div>
+    </div>
+  </section>
+);
+
 const Footer = () => (
   <footer className="py-12 px-6 border-t border-slate-200 bg-white text-center text-slate-500 text-sm">
     <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
@@ -700,6 +764,7 @@ export default function App() {
 
       {/* The rest of the page is below the overlay (z-40) */}
       <ApplicationForm enabled={videoFinished} id="form-hero" />
+      <CertificationBanner />
       <WhatIsIt />
       <WhatYouWillDo />
       <Offers />
