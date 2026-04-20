@@ -138,7 +138,7 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
     >
       <video
         ref={videoRef}
-        src="https://360conecta.com/img/video.mp4"
+        src="https://360conecta.com/img/video1.webm"
         className="w-full h-full object-contain cursor-pointer"
         onTimeUpdate={handleTimeUpdate}
         onEnded={onFinished}
@@ -531,7 +531,7 @@ const WhoWeSeek = () => {
           </div>
           <div>
             <img 
-              src="https://360conecta.com/img/grupo2masgrande.jpeg" 
+              src="https://360conecta.com/img/grupo1.jpeg" 
               alt="Equipo Conecta 360" 
               className="rounded-3xl shadow-2xl w-full object-cover aspect-[4/3]"
               referrerPolicy="no-referrer"
@@ -690,17 +690,8 @@ const ApplicationForm = ({ enabled, id }: { enabled: boolean, id?: string }) => 
 };
 
 const FinalCTA = () => (
-  <section className="relative section-padding bg-slate-900 text-white text-center overflow-hidden">
-    {/* Final team image as requested */}
-    <div className="absolute inset-0 z-0 opacity-20">
-      <img 
-        src="https://360conecta.com/img/grupo1.jpeg" 
-        alt="Equipo Final Conecta 360" 
-        className="w-full h-full object-cover"
-        referrerPolicy="no-referrer"
-      />
-    </div>
-    <div className="max-w-3xl mx-auto relative z-10">
+  <section className="section-padding bg-slate-900 text-white text-center">
+    <div className="max-w-3xl mx-auto">
       <h2 className="font-display text-4xl md:text-5xl font-bold mb-6">Si esto te hizo sentido, aplica.</h2>
       <p className="text-xl text-slate-400 mb-10 leading-relaxed">
         No es para todos. Pero si es para ti… puede cambiar tu forma de generar ingresos.
