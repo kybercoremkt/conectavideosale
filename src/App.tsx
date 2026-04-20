@@ -132,13 +132,13 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
 
   return (
     <div 
-      className="max-w-4xl w-full aspect-video bg-slate-900 rounded-2xl overflow-hidden shadow-2xl relative group mx-auto my-2 z-50"
+      className="max-w-[340px] md:max-w-[380px] w-full aspect-[9/16] bg-slate-900 rounded-3xl overflow-hidden shadow-2xl relative group mx-auto my-4 z-50 border-4 border-slate-800"
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => isPlaying && setShowControls(false)}
     >
       <video
         ref={videoRef}
-        src="https://360conecta.com/test.mp4"
+        src="https://360conecta.com/img/video.mp4"
         className="w-full h-full object-contain cursor-pointer"
         onTimeUpdate={handleTimeUpdate}
         onEnded={onFinished}
@@ -233,9 +233,9 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-8 max-w-md"
+              className="mb-6 px-4"
             >
-              <p className="text-white text-xl md:text-2xl font-bold leading-tight">
+              <p className="text-white text-lg md:text-xl font-bold leading-tight drop-shadow-lg">
                 Por favor termina de ver el video para poder aplicar a esta carrera
               </p>
             </motion.div>
@@ -332,7 +332,7 @@ const WhatIsIt = () => (
         </div>
         <div className="relative">
           <img 
-            src="https://360conecta.com/img/grupo1.jpeg" 
+            src="https://360conecta.com/img/labuena.jpeg" 
             alt="Consultores Conecta 360" 
             className="rounded-3xl shadow-2xl w-full object-cover aspect-[4/3]"
             referrerPolicy="no-referrer"
@@ -690,8 +690,17 @@ const ApplicationForm = ({ enabled, id }: { enabled: boolean, id?: string }) => 
 };
 
 const FinalCTA = () => (
-  <section className="section-padding bg-slate-900 text-white text-center">
-    <div className="max-w-3xl mx-auto">
+  <section className="relative section-padding bg-slate-900 text-white text-center overflow-hidden">
+    {/* Final team image as requested */}
+    <div className="absolute inset-0 z-0 opacity-20">
+      <img 
+        src="https://360conecta.com/img/grupo1.jpeg" 
+        alt="Equipo Final Conecta 360" 
+        className="w-full h-full object-cover"
+        referrerPolicy="no-referrer"
+      />
+    </div>
+    <div className="max-w-3xl mx-auto relative z-10">
       <h2 className="font-display text-4xl md:text-5xl font-bold mb-6">Si esto te hizo sentido, aplica.</h2>
       <p className="text-xl text-slate-400 mb-10 leading-relaxed">
         No es para todos. Pero si es para ti… puede cambiar tu forma de generar ingresos.
