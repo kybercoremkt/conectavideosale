@@ -23,21 +23,21 @@ import {
 } from 'lucide-react';
 
 const Header = ({ isVideoFinished }: { isVideoFinished: boolean }) => (
-  <header className="absolute top-0 left-0 right-0 z-[60] p-6">
+  <header className={`z-[60] p-4 transition-colors duration-700 ${isVideoFinished ? 'bg-white border-b border-slate-200' : 'bg-black border-b border-white/10'}`}>
     <div className="max-w-7xl mx-auto flex justify-between items-center">
-      <div className="bg-white p-2 rounded-xl shadow-lg">
+      <div className={`${isVideoFinished ? 'bg-slate-50' : 'bg-white'} p-2 rounded-xl shadow-md transition-colors duration-700`}>
         <img 
           src="https://360conecta.com/img/Logogrande.png" 
           alt="Conecta 360 Logo" 
-          className="h-10 md:h-14 w-auto object-contain"
+          className="h-8 md:h-10 w-auto object-contain"
           referrerPolicy="no-referrer"
         />
       </div>
-      <div className="bg-white p-2 rounded-xl shadow-lg">
+      <div className="bg-white p-4 rounded-xl shadow-md transition-colors duration-700">
         <img 
           src="https://www.metlife.com.mx/content/dam/metlifecom/global/icons-header/metlife_logo.png" 
           alt="MetLife Logo" 
-          className="h-8 md:h-12 w-auto object-contain"
+          className="h-6 md:h-8 w-auto object-contain"
           referrerPolicy="no-referrer"
         />
       </div>
@@ -250,37 +250,39 @@ const VideoPlayer = ({ onFinished }: { onFinished: () => void }) => {
 };
 
 const Hero = ({ onVideoFinished, isVideoFinished }: { onVideoFinished: () => void, isVideoFinished: boolean }) => (
-  <section className={`relative min-h-screen md:h-screen flex flex-col items-center justify-center text-center px-4 py-8 overflow-hidden transition-colors duration-700 ${isVideoFinished ? 'bg-slate-50' : 'bg-slate-900'}`}>
+  <section className={`relative min-h-screen flex flex-col overflow-hidden transition-colors duration-700 ${isVideoFinished ? 'bg-slate-50' : 'bg-black'}`}>
     <Header isVideoFinished={isVideoFinished} />
-    <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,179,2,0.1),transparent_50%)]" />
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="max-w-4xl w-full relative z-50 flex flex-col items-center"
-    >
-      <h1 className={`font-display text-3xl md:text-5xl lg:text-6xl font-extrabold mb-3 leading-tight transition-colors duration-700 ${isVideoFinished ? 'text-slate-900' : 'text-white'}`}>
-        Esta carrera <span className="text-brand">no es para todos…</span>
-      </h1>
-      
-      <div className="w-full max-w-3xl">
-        <VideoPlayer onFinished={onVideoFinished} />
-      </div>
+    <div className="flex-1 flex flex-col items-center justify-center text-center px-4 py-12 relative">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,179,2,0.1),transparent_50%)]" />
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-4xl w-full relative z-50 flex flex-col items-center"
+      >
+        <h1 className={`font-display text-3xl md:text-5xl lg:text-6xl font-extrabold mb-3 leading-tight transition-colors duration-700 ${isVideoFinished ? 'text-slate-900' : 'text-white'}`}>
+          Esta carrera <span className="text-brand">no es para todos…</span>
+        </h1>
+        
+        <div className="w-full max-w-3xl">
+          <VideoPlayer onFinished={onVideoFinished} />
+        </div>
 
-      <AnimatePresence>
-        {isVideoFinished && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center mt-4"
-          >
-            <a href="#form-hero" className="bg-brand text-slate-900 px-8 py-3 rounded-xl font-bold text-lg hover:bg-brand-dark transition-all flex items-center justify-center gap-2 group shadow-lg shadow-brand/20">
-              Quiero aplicar <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+        <AnimatePresence>
+          {isVideoFinished && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center mt-4"
+            >
+              <a href="#form-hero" className="bg-brand text-slate-900 px-8 py-3 rounded-xl font-bold text-lg hover:bg-brand-dark transition-all flex items-center justify-center gap-2 group shadow-lg shadow-brand/20">
+                Quiero aplicar <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </a>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </div>
   </section>
 );
 
@@ -316,7 +318,7 @@ const WhatIsIt = () => (
               </div>
               <div>
                 <h3 className="font-bold text-xl mb-1 text-slate-900">Construyes un ingreso propio</h3>
-                <p className="text-slate-600">Sin techos. Tus resultados determinan directamente cuánto ganas.</p>
+                <p className="text-slate-600">Sin límites. Tus resultados determinan directamente cuánto ganas.</p>
               </div>
             </div>
             <div className="flex gap-4">
@@ -325,7 +327,7 @@ const WhatIsIt = () => (
               </div>
               <div>
                 <h3 className="font-bold text-xl mb-1 text-slate-900">Monetiza tu red</h3>
-                <p className="text-slate-600">Aprende a ofrecer soluciones reales en protección financiera a quienes ya confían en ti.</p>
+                <p className="text-slate-600">Aprende a ofrecer soluciones reales en protección patrimonial a quienes ya confían en ti.</p>
               </div>
             </div>
           </div>
@@ -349,8 +351,8 @@ const WhatIsIt = () => (
 
 const WhatYouWillDo = () => {
   const steps = [
-    "Asesorar personas en protección financiera",
     "Detectar necesidades reales",
+    "Asesorar personas en protección patrimonial",
     "Ofrecer soluciones personalizadas",
     "Construir tu propia cartera de clientes",
     "Generar ingresos directamente de tus resultados"
@@ -393,11 +395,11 @@ const WhatYouWillDo = () => {
 
 const Offers = () => {
   const items = [
-    { icon: <DollarSign />, title: "Sin inversión inicial", desc: "Cero pesos para iniciar" },
+    { icon: <DollarSign />, title: "Sin inversión inicial", desc: "Solo tiempo y disciplina" },
     { icon: <GraduationCap />, title: "Formación profesional", desc: "Capacitación completa desde cero" },
     { icon: <Award />, title: "Certificación formal", desc: "Te preparas como consultor profesional" },
     { icon: <MessageSquare />, title: "Acompañamiento", desc: "Mentoría durante el proceso" },
-    { icon: <ShieldCheck />, title: "Respaldo de MetLife", desc: "Trabajas con una aseguradora sólida" },
+    { icon: <ShieldCheck />, title: "Respaldo de MetLife", desc: "La aseguradora #1 del mundo" },
   ];
 
   return (
@@ -657,6 +659,7 @@ const ApplicationForm = ({ enabled, id }: { enabled: boolean, id?: string }) => 
               <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">Escolaridad</label>
               <select disabled={!enabled} required className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed">
                 <option value="">Selecciona una opción</option>
+                <option value="secundaria">Secundaria</option>
                 <option value="preparatoria">Preparatoria</option>
                 <option value="licenciatura">Licenciatura</option>
                 <option value="posgrado">Posgrado</option>
@@ -706,17 +709,27 @@ const FinalCTA = () => (
 const CertificationBanner = () => (
   <section className="py-12 bg-white border-y border-slate-100">
     <div className="max-w-4xl mx-auto px-6 flex flex-col md:flex-row items-center justify-center gap-8 text-center md:text-left">
-      <div className="bg-white p-4 rounded-2xl shadow-md border border-slate-50">
-        <img 
-          src="https://www.metlife.com.mx/content/dam/metlifecom/global/icons-header/metlife_logo.png" 
-          alt="MetLife Logo" 
-          className="h-12 w-auto object-contain"
-          referrerPolicy="no-referrer"
-        />
+      <div className="flex gap-4 items-center">
+        <div className="bg-white p-3 rounded-2xl shadow-md border border-slate-50">
+          <img 
+            src="https://360conecta.com/img/Logogrande.png" 
+            alt="Conecta 360 Logo" 
+            className="h-8 md:h-10 w-auto object-contain"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+        <div className="bg-white p-5 rounded-2xl shadow-md border border-slate-50">
+          <img 
+            src="https://www.metlife.com.mx/content/dam/metlifecom/global/icons-header/metlife_logo.png" 
+            alt="MetLife Logo" 
+            className="h-8 md:h-10 w-auto object-contain"
+            referrerPolicy="no-referrer"
+          />
+        </div>
       </div>
       <div>
         <h2 className="text-2xl md:text-3xl font-display font-bold text-slate-900">
-          Promotoría aprobada y certificada por MetLife
+          Promotoría certificada por MetLife
         </h2>
         <p className="text-slate-600 mt-2">
           Garantizamos los más altos estándares de calidad y profesionalismo en el sector asegurador.
@@ -751,7 +764,7 @@ export default function App() {
   }, []);
 
   if (!isMounted) {
-    return <div className="min-h-screen bg-slate-900" />;
+    return <div className="min-h-screen bg-black" />;
   }
 
   return (
