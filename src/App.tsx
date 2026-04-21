@@ -29,7 +29,7 @@ const Header = ({ isVideoFinished }: { isVideoFinished: boolean }) => (
         <img 
           src="https://360conecta.com/img/Logogrande.png" 
           alt="Conecta 360 Logo" 
-          className="h-8 md:h-10 w-auto object-contain"
+          className="h-12 md:h-16 w-auto object-contain"
           referrerPolicy="no-referrer"
         />
       </div>
@@ -714,7 +714,7 @@ const CertificationBanner = () => (
           <img 
             src="https://360conecta.com/img/Logogrande.png" 
             alt="Conecta 360 Logo" 
-            className="h-8 md:h-10 w-auto object-contain"
+            className="h-12 md:h-16 w-auto object-contain"
             referrerPolicy="no-referrer"
           />
         </div>
