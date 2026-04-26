@@ -608,16 +608,125 @@ const FAQ = () => {
   );
 };
 
-const ApplicationForm = ({ enabled, id }: { enabled: boolean, id?: string }) => {
-  const [submitted, setSubmitted] = useState(false);
+const countryCodes = [
+  { code: '+52', name: 'MX' },
+  { code: '+1', name: 'US/CA' },
+  { code: '+34', name: 'ES' },
+  { code: '+57', name: 'CO' },
+  { code: '+54', name: 'AR' },
+  { code: '+56', name: 'CL' },
+  { code: '+51', name: 'PE' },
+  { code: '+506', name: 'CR' },
+  { code: '+507', name: 'PA' },
+  { code: '+593', name: 'EC' },
+];
 
-  const handleSubmit = (e: React.FormEvent) => {
+const ApplicationForm = ({ enabled, id, onEtapaReached }: { enabled: boolean, id?: string, onEtapaReached: () => void }) => {
+  const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    nombre: '',
+    whatsapp: '',
+    countryCode: '+52',
+    email: '',
+    edad: '',
+    escolaridad: '',
+    redContactos: '',
+    motivacion: '',
+    acceptCommissions: false
+  });
+  const [utms, setUtms] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [educationIssue, setEducationIssue] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const capturedUtms: Record<string, string> = {};
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(param => {
+      const val = params.get(param);
+      if (val) capturedUtms[param] = val;
+    });
+    setUtms(capturedUtms);
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!enabled) return;
-    setSubmitted(true);
+    if (!enabled || isSubmitting) return;
+
+    if (formData.escolaridad === 'secundaria') {
+      setEducationIssue(true);
+      setSubmitted(true);
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Format phone number for Mexico as requested: +521 instead of +52
+      let finalWhatsapp = `${formData.countryCode}${formData.whatsapp}`;
+      if (formData.countryCode === '+52') {
+        const cleanNumber = formData.whatsapp.replace(/\s+/g, '');
+        finalWhatsapp = `+521${cleanNumber}`;
+      }
+
+      const payload = {
+        ...formData,
+        whatsapp: finalWhatsapp,
+        ...utms,
+        timestamp: new Date().toISOString(),
+        source_url: window.location.href
+      };
+
+      await fetch('https://n8n.srv1410797.hstgr.cloud/webhook-test/ea1c36c2-b1bc-4e0a-8081-8d373b329221', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      onEtapaReached();
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // Still show success to user for better UX, or could show error message
+      onEtapaReached();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    const val = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+    setFormData(prev => ({ ...prev, [name]: val }));
   };
 
   if (submitted) {
+    if (educationIssue) {
+      return (
+        <section id={id} className="section-padding bg-slate-900 text-white text-center">
+          <div className="max-w-2xl mx-auto py-20 px-6">
+            <div className="w-20 h-20 bg-brand/20 rounded-full flex items-center justify-center mx-auto mb-8">
+              <GraduationCap className="w-10 h-10 text-brand" />
+            </div>
+            <h2 className="text-3xl font-bold mb-6">Requerimiento de Certificación</h2>
+            <p className="text-xl text-slate-300 mb-8 leading-relaxed">
+              Para certificarte como <strong>Consultor de Seguros profesional ante MetLife</strong>, la autoridad regulatoria exige contar con el certificado de <strong>Preparatoria (Bachillerato)</strong> concluido.
+            </p>
+            <div className="bg-white/5 border border-white/10 p-8 rounded-3xl mb-10">
+              <p className="text-lg text-brand font-bold mb-4">¿Te gustaría terminar tu prepa?</p>
+              <p className="text-slate-400 mb-6">Aquí tienes una opción oficial y gratuita para concluir tus estudios:</p>
+              <a 
+                href="https://prepaenlinea.sep.gob.mx/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-brand transition-all"
+              >
+                Prepa en Línea SEP <ArrowRight className="w-5 h-5" />
+              </a>
+            </div>
+            <p className="text-slate-500">Una vez que cuentes con tu certificado, estaremos encantados de que vuelvas a aplicar.</p>
+          </div>
+        </section>
+      );
+    }
+
     return (
       <section id={id} className="section-padding bg-brand text-slate-900 text-center">
         <div className="max-w-2xl mx-auto py-20">
@@ -635,29 +744,91 @@ const ApplicationForm = ({ enabled, id }: { enabled: boolean, id?: string }) => 
         <div className={`bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-100 transition-all ${!enabled ? 'opacity-50 grayscale pointer-events-none' : ''}`}>
           <SectionHeading title="Aplica para conocer más" />
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">Nombre completo</label>
-                <input disabled={!enabled} required type="text" className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed" placeholder="Tu nombre" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">WhatsApp</label>
-                <input disabled={!enabled} required type="tel" className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed" placeholder="Tu número" />
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">Nombre completo</label>
+              <input 
+                disabled={!enabled} 
+                required 
+                name="nombre" 
+                value={formData.nombre} 
+                onChange={handleInputChange} 
+                type="text" 
+                className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed" 
+                placeholder="Tu nombre completo" 
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">WhatsApp</label>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex gap-2">
+                  <select 
+                    disabled={!enabled}
+                    name="countryCode"
+                    value={formData.countryCode}
+                    onChange={handleInputChange}
+                    className="p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed font-medium text-slate-700 sm:w-32"
+                  >
+                    {countryCodes.map(c => (
+                      <option key={c.code} value={c.code}>{c.name} {c.code}</option>
+                    ))}
+                  </select>
+                </div>
+                <input 
+                  disabled={!enabled} 
+                  required 
+                  name="whatsapp" 
+                  value={formData.whatsapp} 
+                  onChange={handleInputChange} 
+                  type="tel" 
+                  pattern="[0-9]{10,15}"
+                  title="Ingresa de 10 a 15 dígitos"
+                  className="flex-1 min-w-0 p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed" 
+                  placeholder="Tu número a 10 dígitos" 
+                />
               </div>
             </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">Email</label>
-                <input disabled={!enabled} required type="email" className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed" placeholder="tu@email.com" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">Edad</label>
-                <input disabled={!enabled} required type="number" className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed" placeholder="Tu edad" />
-              </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">Email</label>
+              <input 
+                disabled={!enabled} 
+                required 
+                name="email" 
+                value={formData.email} 
+                onChange={handleInputChange} 
+                type="email" 
+                className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed" 
+                placeholder="tu@email.com" 
+              />
             </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">Edad</label>
+              <input 
+                disabled={!enabled} 
+                required 
+                name="edad" 
+                value={formData.edad} 
+                onChange={handleInputChange} 
+                type="number" 
+                min="18"
+                max="99"
+                className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed" 
+                placeholder="Tu edad" 
+              />
+            </div>
+
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">Escolaridad</label>
-              <select disabled={!enabled} required className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed">
+              <select 
+                disabled={!enabled} 
+                required 
+                name="escolaridad" 
+                value={formData.escolaridad} 
+                onChange={handleInputChange} 
+                className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed text-slate-700"
+              >
                 <option value="">Selecciona una opción</option>
                 <option value="secundaria">Secundaria</option>
                 <option value="preparatoria">Preparatoria</option>
@@ -665,25 +836,57 @@ const ApplicationForm = ({ enabled, id }: { enabled: boolean, id?: string }) => 
                 <option value="posgrado">Posgrado</option>
               </select>
             </div>
+
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">¿Tienes red de contactos?</label>
-              <select disabled={!enabled} required className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed">
+              <select 
+                disabled={!enabled} 
+                required 
+                name="redContactos" 
+                value={formData.redContactos} 
+                onChange={handleInputChange} 
+                className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed text-slate-700"
+              >
                 <option value="">Selecciona una opción</option>
                 <option value="si">Sí, amplia</option>
                 <option value="media">Media</option>
                 <option value="no">No por ahora</option>
               </select>
             </div>
+
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">¿Qué te motiva a aplicar?</label>
-              <textarea disabled={!enabled} required className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all h-32 disabled:cursor-not-allowed" placeholder="Cuéntanos un poco sobre ti"></textarea>
+              <textarea 
+                disabled={!enabled} 
+                required 
+                name="motivacion" 
+                value={formData.motivacion} 
+                onChange={handleInputChange} 
+                className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all h-32 disabled:cursor-not-allowed" 
+                placeholder="Cuéntanos un poco sobre ti"
+              ></textarea>
             </div>
+
             <div className="flex items-start gap-3 bg-brand/5 p-4 rounded-xl border border-brand/10">
-              <input disabled={!enabled} required type="checkbox" className="mt-1 w-5 h-5 rounded border-slate-300 text-brand focus:ring-brand disabled:cursor-not-allowed" />
-              <label className="text-sm text-slate-700 font-medium">Entiendo que es una carrera basada 100% en comisiones y resultados.</label>
+              <input 
+                disabled={!enabled} 
+                required 
+                name="acceptCommissions" 
+                checked={formData.acceptCommissions} 
+                onChange={handleInputChange} 
+                type="checkbox" 
+                className="mt-1 w-5 h-5 rounded border-slate-300 text-brand focus:ring-brand disabled:cursor-not-allowed" 
+              />
+              <label className="text-sm text-slate-700 font-medium leading-tight">Entiendo que es una carrera basada 100% en comisiones y resultados.</label>
             </div>
-            <button disabled={!enabled} type="submit" className="w-full bg-brand text-slate-900 py-5 rounded-xl font-bold text-xl hover:bg-brand-dark transition-all shadow-lg shadow-brand/20 flex items-center justify-center gap-2 disabled:bg-slate-300 disabled:shadow-none disabled:cursor-not-allowed">
-              {enabled ? 'Enviar aplicación' : 'Mira el video para activar'} <ArrowRight className="w-6 h-6" />
+
+            <button 
+              disabled={!enabled || isSubmitting} 
+              type="submit" 
+              className="w-full bg-brand text-slate-900 py-5 rounded-xl font-bold text-xl hover:bg-brand-dark transition-all shadow-lg shadow-brand/20 flex items-center justify-center gap-2 disabled:bg-slate-300 disabled:shadow-none disabled:cursor-not-allowed group"
+            >
+              {isSubmitting ? 'Enviando...' : (enabled ? 'Enviar aplicación' : 'Mira el video para activar')} 
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </button>
           </form>
         </div>
@@ -748,8 +951,7 @@ const Footer = () => (
       </div>
       <p>© 2026 Conecta 360. Respaldado por MetLife. Todos los derechos reservados.</p>
       <div className="flex gap-6">
-        <a href="#" className="hover:text-brand transition-colors">Privacidad</a>
-        <a href="#" className="hover:text-brand transition-colors">Términos</a>
+        <a href="https://360conecta.com/aviso-de-privacidad" target="_blank" rel="noopener noreferrer" className="hover:text-brand transition-colors">Aviso de Privacidad</a>
       </div>
     </div>
   </footer>
@@ -758,13 +960,70 @@ const Footer = () => (
 export default function App() {
   const [videoFinished, setVideoFinished] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isEtapaView, setIsEtapaView] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
+    if (window.location.pathname === '/etapa') {
+      setIsEtapaView(true);
+    }
+
+    // Handle back button for the simulated route
+    const handlePopState = () => {
+      setIsEtapaView(window.location.pathname === '/etapa');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   if (!isMounted) {
     return <div className="min-h-screen bg-black" />;
+  }
+
+  if (isEtapaView) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <Header isVideoFinished={true} />
+        <main className="section-padding flex flex-col items-center justify-center min-h-[80vh] text-center px-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="w-24 h-24 bg-brand rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl shadow-brand/20">
+              <CheckCircle2 className="w-12 h-12 text-slate-900" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-slate-900 mb-6">¡Paso 1 completado!</h1>
+            <div className="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-100 mb-8">
+              <p className="text-xl text-slate-700 mb-8 leading-relaxed">
+                Gracias por tu interés en iniciar tu carrera con nosotros. Tu información ha sido recibida correctamente.
+              </p>
+              <div className="space-y-6 text-left max-w-md mx-auto">
+                <div className="flex gap-4 items-start">
+                  <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center shrink-0">
+                    <MessageSquare className="text-brand w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900">Mensaje de WhatsApp</p>
+                    <p className="text-slate-600">Recibirás un mensaje automático con los detalles de la siguiente etapa.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4 items-start">
+                  <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center shrink-0">
+                    <Globe className="text-brand w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900">Correo Electrónico</p>
+                    <p className="text-slate-600">Te hemos enviado un email con la información detallada del proceso.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p className="text-slate-500 italic">Por favor, mantente atento a tus notificaciones.</p>
+          </div>
+        </main>
+        <footer className="py-12 bg-white text-center border-t border-slate-200">
+          <p className="text-slate-400 text-sm font-medium uppercase tracking-widest mb-4">© 2026 Conecta 360 & MetLife</p>
+          <a href="https://360conecta.com/aviso-de-privacidad" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-brand transition-colors text-sm underline underline-offset-4">Aviso de Privacidad</a>
+        </footer>
+      </div>
+    );
   }
 
   return (
@@ -776,7 +1035,15 @@ export default function App() {
       />
 
       {/* The rest of the page is below the overlay (z-40) */}
-      <ApplicationForm enabled={videoFinished} id="form-hero" />
+      <ApplicationForm 
+        enabled={videoFinished} 
+        id="form-hero" 
+        onEtapaReached={() => {
+          window.history.pushState(null, '', '/etapa');
+          setIsEtapaView(true);
+          window.scrollTo(0, 0);
+        }} 
+      />
       <CertificationBanner />
       <WhatIsIt />
       <WhatYouWillDo />
@@ -786,7 +1053,15 @@ export default function App() {
       <WhoWeSeek />
       <Comparison />
       <FAQ />
-      <ApplicationForm enabled={videoFinished} id="form" />
+      <ApplicationForm 
+        enabled={videoFinished} 
+        id="form" 
+        onEtapaReached={() => {
+          window.history.pushState(null, '', '/etapa');
+          setIsEtapaView(true);
+          window.scrollTo(0, 0);
+        }} 
+      />
       <FinalCTA />
       <Footer />
     </div>
