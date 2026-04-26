@@ -636,7 +636,6 @@ const ApplicationForm = ({ enabled, id, onEtapaReached }: { enabled: boolean, id
   });
   const [utms, setUtms] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [educationIssue, setEducationIssue] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -652,8 +651,7 @@ const ApplicationForm = ({ enabled, id, onEtapaReached }: { enabled: boolean, id
     e.preventDefault();
     if (!enabled || isSubmitting) return;
 
-    if (formData.escolaridad === 'secundaria') {
-      setEducationIssue(true);
+    if (formData.escolaridad === 'secundaria' || formData.edad === '18 a 23') {
       setSubmitted(true);
       return;
     }
@@ -698,35 +696,6 @@ const ApplicationForm = ({ enabled, id, onEtapaReached }: { enabled: boolean, id
   };
 
   if (submitted) {
-    if (educationIssue) {
-      return (
-        <section id={id} className="section-padding bg-slate-900 text-white text-center">
-          <div className="max-w-2xl mx-auto py-20 px-6">
-            <div className="w-20 h-20 bg-brand/20 rounded-full flex items-center justify-center mx-auto mb-8">
-              <GraduationCap className="w-10 h-10 text-brand" />
-            </div>
-            <h2 className="text-3xl font-bold mb-6">Requerimiento de Certificación</h2>
-            <p className="text-xl text-slate-300 mb-8 leading-relaxed">
-              Para certificarte como <strong>Consultor de Seguros profesional ante MetLife</strong>, la autoridad regulatoria exige contar con el certificado de <strong>Preparatoria (Bachillerato)</strong> concluido.
-            </p>
-            <div className="bg-white/5 border border-white/10 p-8 rounded-3xl mb-10">
-              <p className="text-lg text-brand font-bold mb-4">¿Te gustaría terminar tu prepa?</p>
-              <p className="text-slate-400 mb-6">Aquí tienes una opción oficial y gratuita para concluir tus estudios:</p>
-              <a 
-                href="https://prepaenlinea.sep.gob.mx/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-brand transition-all"
-              >
-                Prepa en Línea SEP <ArrowRight className="w-5 h-5" />
-              </a>
-            </div>
-            <p className="text-slate-500">Una vez que cuentes con tu certificado, estaremos encantados de que vuelvas a aplicar.</p>
-          </div>
-        </section>
-      );
-    }
-
     return (
       <section id={id} className="section-padding bg-brand text-slate-900 text-center">
         <div className="max-w-2xl mx-auto py-20">
@@ -805,18 +774,20 @@ const ApplicationForm = ({ enabled, id, onEtapaReached }: { enabled: boolean, id
 
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">Edad</label>
-              <input 
+              <select 
                 disabled={!enabled} 
                 required 
                 name="edad" 
                 value={formData.edad} 
                 onChange={handleInputChange} 
-                type="number" 
-                min="18"
-                max="99"
-                className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed" 
-                placeholder="Tu edad" 
-              />
+                className="w-full p-4 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-brand outline-none transition-all disabled:cursor-not-allowed text-slate-700"
+              >
+                <option value="">Selecciona tu rango de edad</option>
+                <option value="18 a 23">18 a 23 años</option>
+                <option value="24 a 30">24 a 30 años</option>
+                <option value="30 a 40">30 a 40 años</option>
+                <option value="40 a 60">40 a 60 años</option>
+              </select>
             </div>
 
             <div className="space-y-2">
